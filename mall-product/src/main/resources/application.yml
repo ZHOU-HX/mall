@@ -2,15 +2,34 @@ spring:
   datasource:
     username: root
     password: zhx
-    url: jdbc:mysql://192.168.109.136:3306/mall_pms
+    url: jdbc:mysql://192.168.109.138:3306/mall_pms
     driver-class-name: com.mysql.cj.jdbc.Driver
+  cloud:
+    nacos:
+      discovery:
+        server-addr: 127.0.0.1:8848
+    alicloud:
+      access-key: LTAI5tEwgbDXX3eSf8UiQGqt
+      secret-key: Wi5g2BOn3l5wJzzK0aWY4WkOGG2YZL
+      oss:
+        endpoint: oss-cn-hangzhou.aliyuncs.com
+  jackson:
+    date-format: yyyy-MM-dd HH:mm:ss
+    time-zone: GMT+8
 
 mybatis-plus:
   mapper-locations: classpath:/mapper/**/*.xml    # 如果写成“classpath:/mapper/**/*.xml”代表不止扫描自己的classpath，还扫描别人的
   global-config:
     db-config:
       id-type: auto     # 代表主键自增
+      logic-delete-value: 0           # 已经删除
+      logic-not-delete-value: 1       # 没有删除
 
 # 端口号
 server:
   port: 12000
+
+# 调整日志级别
+logging:
+  level:
+    com.hxzhou.mall: debug

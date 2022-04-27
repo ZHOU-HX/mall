@@ -13,6 +13,9 @@
         <result property="wareId" column="ware_id"/>
         <result property="status" column="status"/>
     </resultMap>
+    <update id="updateBySkuId">
+        update wms_purchase_detail set status=#{status} where sku_id=#{skuId}
+    </update>
 
 
 </mapper>

@@ -13,6 +13,7 @@
         <option value="$PROJECT_DIR$/mall-coupon/pom.xml" />
         <option value="$PROJECT_DIR$/pom.xml" />
         <option value="$PROJECT_DIR$/mall-gateway/pom.xml" />
+        <option value="$PROJECT_DIR$/mall-third-party/pom.xml" />
       </list>
     </option>
   </component>

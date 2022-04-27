@@ -15,12 +15,18 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 @Configuration
 public class CorsConfig implements WebMvcConfigurer {
 
-    @Override
-    public void addCorsMappings(CorsRegistry registry) {
-        registry.addMapping("/**")
-            .allowedOrigins("*")
-            .allowCredentials(true)
-            .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
-            .maxAge(3600);
-    }
+//    @Override
+//    public void addCorsMappings(CorsRegistry registry) {
+//        /**
+//         * 验证码报200但是没有出现图片的原因是springboot版本太高
+//         * 在2.4.x版本中需要在config目录下的CorsConfig类下
+//         * 将.allowedOrigins替换成.allowedOriginPatterns即可
+//         */
+//        registry.addMapping("/**")
+////            .allowedOrigins("*")
+//            .allowedOriginPatterns("*")
+//            .allowCredentials(true)
+//            .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
+//            .maxAge(3600);
+//    }
 }

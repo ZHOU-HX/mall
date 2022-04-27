@@ -3,6 +3,7 @@ package com.hxzhou.mall.coupon.controller;
 import java.util.Arrays;
 import java.util.Map;
 
+import com.hxzhou.common.to.SkuReductionTo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -27,8 +28,16 @@ import com.hxzhou.common.utils.R;
 @RestController
 @RequestMapping("coupon/skufullreduction")
 public class SkuFullReductionController {
+
     @Autowired
     private SkuFullReductionService skuFullReductionService;
+
+    @RequestMapping("/saveinfo")
+    public R saveInfo(@RequestBody SkuReductionTo skuReductionTo){
+        skuFullReductionService.saveSkuReduction(skuReductionTo);
+
+        return R.ok();
+    }
 
     /**
      * 列表

@@ -11,6 +11,18 @@
 
     <artifactId>mall-common</artifactId>
     <description>每一个微服务公共的依赖、bean、工具类等</description>
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>8</source>
+                    <target>8</target>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 
     <dependencies>
         <!-- mybatis-plus：操作数据库的 -->
@@ -58,7 +70,7 @@
         <dependency>
             <groupId>com.alibaba.cloud</groupId>
             <artifactId>spring-cloud-starter-alibaba-nacos-discovery</artifactId>
-            <version>2.2.6.RELEASE</version>
+            <version>2.2.0.RELEASE</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.springframework.cloud</groupId>
@@ -76,7 +88,7 @@
         <dependency>
             <groupId>com.alibaba.cloud</groupId>
             <artifactId>spring-cloud-starter-alibaba-nacos-config</artifactId>
-            <version>2.2.6.RELEASE</version>
+            <version>2.2.0.RELEASE</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.springframework.cloud</groupId>
@@ -90,6 +102,20 @@
             <version>3.0.2</version>
         </dependency>
 
+        <!-- 检验数据用的 -->
+        <dependency>
+            <groupId>org.hibernate.validator</groupId>
+            <artifactId>hibernate-validator</artifactId>
+            <version>6.2.3.Final</version>
+        </dependency>
+
+        <!-- 用于编写自定义校验器 -->
+<!--        <dependency>-->
+<!--            <groupId>javax.validation</groupId>-->
+<!--            <artifactId>validation-api</artifactId>-->
+<!--            <version>1.1.0.Alpha1</version>-->
+<!--        </dependency>-->
+
     </dependencies>
 
 
@@ -99,7 +125,7 @@
             <dependency>
                 <groupId>com.alibaba.cloud</groupId>
                 <artifactId>spring-cloud-alibaba-dependencies</artifactId>
-                <version>2.2.4.RELEASE</version>
+                <version>2.2.1.RELEASE</version>
                 <scope>import</scope>
             </dependency>
         </dependencies>
