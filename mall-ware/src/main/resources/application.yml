@@ -2,7 +2,7 @@ spring:
   datasource:
     username: root
     password: zhx
-    url: jdbc:mysql://192.168.109.138:3306/mall_wms
+    url: jdbc:mysql://192.168.109.139:3306/mall_wms
     driver-class-name: com.mysql.cj.jdbc.Driver
 
   cloud:

@@ -2,7 +2,7 @@ spring:
   datasource:
     username: root
     password: zhx
-    url: jdbc:mysql://192.168.109.138:3306/mall_pms
+    url: jdbc:mysql://192.168.109.139:3306/mall_pms
     driver-class-name: com.mysql.cj.jdbc.Driver
   cloud:
     nacos:
@@ -16,6 +16,11 @@ spring:
   jackson:
     date-format: yyyy-MM-dd HH:mm:ss
     time-zone: GMT+8
+  thymeleaf:
+    cache: false    # 关闭缓存
+  redis:
+    host: 192.168.109.139
+    port: 6379
 
 mybatis-plus:
   mapper-locations: classpath:/mapper/**/*.xml    # 如果写成“classpath:/mapper/**/*.xml”代表不止扫描自己的classpath，还扫描别人的
@@ -32,4 +37,4 @@ server:
 # 调整日志级别
 logging:
   level:
-    com.hxzhou.mall: debug
+    com.hxzhou.mall: error

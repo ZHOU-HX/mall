@@ -15,7 +15,7 @@ spring:
         - id: product_route
           uri: lb://mall-product
           predicates:
-            - Path=/api/product/**
+            - Path=/api/product/**,/hello
           filters:
             - RewritePath=/api/(?<segment>.*),/$\{segment}
 
@@ -50,6 +50,18 @@ spring:
             - Path=/api/**
           filters:
             - RewritePath=/api/(?<segment>.*),/renren-fast/$\{segment}
+
+        # 负载均衡的规则：希望所有的主界面请求发送到product服务中
+        - id: mall_host_route
+          uri: lb://mall-product
+          predicates:
+            - Host=mall.com,item.mall.com
+
+        # 负载均衡的规则：希望所有的查询请求发送到search服务中
+        - id: mall_search_route
+          uri: lb://mall-search
+          predicates:
+            - Host=**.mall.com
 
 
 ## 注意：精确路由尽量放在前面，省的被广泛路由提前转发走了

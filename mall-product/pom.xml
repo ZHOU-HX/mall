@@ -39,6 +39,46 @@
             <scope>test</scope>
         </dependency>
 
+        <!-- 模板引擎：thymeleaf -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-thymeleaf</artifactId>
+        </dependency>
+
+        <!-- 解决前端界面更新后，需要重启服务器才会刷新界面的问题 -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-devtools</artifactId>
+            <optional>true</optional>
+        </dependency>
+
+        <!-- 引入radis -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-redis</artifactId>
+        </dependency>
+
+        <!-- 引入redisson来实现缓存的分布式锁，以后使用它来作为所有分布式锁、分布式对象等功能框架 -->
+        <dependency>
+            <groupId>org.redisson</groupId>
+            <artifactId>redisson</artifactId>
+            <version>3.15.2</version>
+        </dependency>
+
+        <!-- 引入SpringCache来简化缓存开发 -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-cache</artifactId>
+        </dependency>
+
+        <!-- configproperties属性的提示工具 -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-configuration-processor</artifactId>
+            <optional>true</optional>
+        </dependency>
+
+
         <!-- 阿里云的OSS -->
 <!--        <dependency>-->
 <!--            <groupId>com.aliyun.oss</groupId>-->

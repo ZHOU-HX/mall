@@ -3,6 +3,7 @@ package com.hxzhou.mall.product;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 import org.springframework.cloud.openfeign.EnableFeignClients;
 
@@ -41,6 +42,46 @@ import org.springframework.cloud.openfeign.EnableFeignClients;
  * 四、统一异常处理 @ControllerAdvice
  *      1 编写异常处理类，使用@ControllerAdvice【在exception包下进行】
  *      2 使用@ExceptionHandler标注方法可以处理的异常【在exception包下进行】
+ *
+ * 五、模板引擎
+ *      1 thymeleaf-starter：关闭缓存
+ *      2 静态资源都放在static文件夹下就可以按照路径直接访问
+ *      3 页面放在template下，直接访问
+ *          原因：SpringBoot访问项目时，默认会找index
+ *      4 页面修改不重启服务器实时更新
+ *          4.1 引入dev-tools
+ *          4.2 修改完界面，还需要编译界面，即在界面中ctrl+shift+F9
+ *
+ * 六、整合redis
+ *      1 引入data-redis-starter
+ *      2 简单配置redis的host等信息
+ *      3 使用springboot自动配置好的StringRedisTemplate来操作redis
+ *
+ * 七、整合redisson
+ *      1 导入依赖【在pom.xml中进行】
+ *      2 配置redisson【在MyRedissonConfig中进行】
+ *
+ * 八、整合SpringCache简化缓存开发
+ *      1 引入依赖【在pom.xml中进行】
+ *          spring-boot-starter-cache和spring-boot-starter-data-redis
+ *      2 写配置
+ *          2.1 自动配置
+ *              CacheAutoConfiguration会导入RedisCacheConfiguration
+ *              自动配好了缓存管理器RedisCacheManager
+ *          2.2 配置使用redis作为缓存【在application.properties文件下进行】
+ *      3 开启缓存功能【在启动类中进行】
+ *      4 测试使用缓存【只需要使用注解就可以使用缓存操作】
+ *          @Cacheable：触发将数据保存到缓存的操作
+ *          @CacheEvict：触发将数据从缓存删除的操作
+ *          @CachePut：不影响方法执行更新缓存
+ *          @Caching：组合以上多个操作
+ *          @CacheConfig：在类级别共享缓存的相同配置
+ *      5 原理
+ *          CacheAutoConfiguration -> RedisCacheConfiguration -> 自动配置了RedisCacheManager
+ *          -> 初始化所有的缓存 -> 每个缓存决定使用什么配置 -> 如果redisCacheConfiguration有就用已有的，没有就用默认配置
+ *          -> 想改缓存的配置，只需要给容器中放一个RedisCacheConfiguration即可
+ *          -> 就会应用到当前RedisCacheManager管理的所有缓存分区中
+ *
  */
 @EnableFeignClients(basePackages = "com.hxzhou.mall.product.feign")        // 开启远程调用功能
 @EnableDiscoveryClient

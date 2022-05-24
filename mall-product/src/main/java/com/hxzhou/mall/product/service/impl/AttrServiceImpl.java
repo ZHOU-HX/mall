@@ -14,6 +14,7 @@ import com.hxzhou.mall.product.vo.AttrRespVo;
 import com.hxzhou.mall.product.vo.AttrVo;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.util.Arrays;
@@ -127,6 +128,7 @@ public class AttrServiceImpl extends ServiceImpl<AttrDao, AttrEntity> implements
     @Autowired
     CategoryService categoryService;
 
+    @Cacheable(value = "attr", key = "'attrinfo:'+#root.args[0]")
     @Override
     public AttrRespVo getAttrInfo(Long attrId) {
         AttrRespVo respVo = new AttrRespVo();
@@ -272,6 +274,16 @@ public class AttrServiceImpl extends ServiceImpl<AttrDao, AttrEntity> implements
         IPage<AttrEntity> page = this.page(new Query<AttrEntity>().getPage(params), wrapper);
 
         return new PageUtils(page);
+    }
+
+    /**
+     * 在指定的所有属性集合里面，挑出检索属性
+     * @param attrIds
+     * @return
+     */
+    @Override
+    public List<Long> selectSearchAttrIds(List<Long> attrIds) {
+        return baseMapper.selectSearchAttrIds(attrIds);
     }
 
 }

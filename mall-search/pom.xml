@@ -15,6 +15,7 @@
     <description>ElasticSearch检索服务</description>
     <properties>
         <java.version>11</java.version>
+        <spring-cloud.version>2020.0.3</spring-cloud.version>
     </properties>
     <dependencies>
         <dependency>
@@ -39,6 +40,24 @@
             <artifactId>elasticsearch-rest-high-level-client</artifactId>
             <version>7.12.1</version>
         </dependency>
+
+        <!-- 引入模板引擎 -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-thymeleaf</artifactId>
+        </dependency>
+
+        <!-- 热启动 -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-devtools</artifactId>
+        </dependency>
+
+        <!-- 远程调用功能 -->
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-openfeign</artifactId>
+        </dependency>
     </dependencies>
 
     <build>
@@ -49,5 +68,17 @@
             </plugin>
         </plugins>
     </build>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-dependencies</artifactId>
+                <version>${spring-cloud.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
 
 </project>

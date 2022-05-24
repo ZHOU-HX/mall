@@ -1,11 +1,17 @@
 package com.hxzhou.mall.product.service.impl;
 
+import com.alibaba.fastjson.TypeReference;
+import com.hxzhou.common.constant.ProductConstant;
 import com.hxzhou.common.to.MemberPrice;
+import com.hxzhou.common.to.SkuHasStockVo;
 import com.hxzhou.common.to.SkuReductionTo;
 import com.hxzhou.common.to.SpuBoundTo;
+import com.hxzhou.common.to.es.SkuEsModel;
 import com.hxzhou.common.utils.R;
 import com.hxzhou.mall.product.entity.*;
 import com.hxzhou.mall.product.feign.CouponFeignService;
+import com.hxzhou.mall.product.feign.SearchFeignService;
+import com.hxzhou.mall.product.feign.WareFeignService;
 import com.hxzhou.mall.product.service.*;
 import com.hxzhou.mall.product.vo.*;
 import org.springframework.beans.BeanUtils;
@@ -14,9 +20,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -56,6 +60,18 @@ public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoDao, SpuInfoEntity> i
 
     @Autowired
     CouponFeignService couponFeignService;
+
+    @Autowired
+    BrandService brandService;
+
+    @Autowired
+    CategoryService categoryService;
+
+    @Autowired
+    WareFeignService wareFeignService;
+
+    @Autowired
+    SearchFeignService searchFeignService;
 
     @Override
     public PageUtils queryPage(Map<String, Object> params) {
@@ -234,6 +250,125 @@ public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoDao, SpuInfoEntity> i
         );
 
         return new PageUtils(page);
+    }
+
+    /**
+     * 商品上架功能
+     * @param spuId
+     */
+    @Override
+    public void up(Long spuId) {
+        /**
+         * 1 查出当前spuid对应的所有sku信息、品牌的名字
+         */
+        List<SkuInfoEntity> skus = skuInfoService.getSkusBySpuId(spuId);
+
+        /**
+         * 2 查询当前sku的所有可以被用来检索的规格属性
+         */
+        List<ProductAttrValueEntity> baseAttrs = productAttrValueService.baseAttrListForSpu(spuId);
+        List<Long> attrIds = baseAttrs.stream().map((attr) -> {
+            return attr.getAttrId();
+        }).collect(Collectors.toList());
+
+        List<Long> searchAttrIds = attrService.selectSearchAttrIds(attrIds);     // 在指定的所有属性集合里面，挑出检索属性
+        Set<Long> idSet = new HashSet<>(searchAttrIds);
+
+        List<SkuEsModel.Attrs> attrsList = baseAttrs.stream().filter((item) -> {
+            return idSet.contains(item.getAttrId());
+        }).map((item) -> {
+            SkuEsModel.Attrs attrs = new SkuEsModel.Attrs();
+            BeanUtils.copyProperties(item, attrs);
+            return attrs;
+        }).collect(Collectors.toList());
+
+        /**
+         * 3 发送远程调用，库存系统查询是否有库存
+         */
+        List<Long> skuIdList = skus.stream().map(SkuInfoEntity::getSkuId).collect(Collectors.toList());
+        Map<Long, Boolean> stockMap = null;
+        try {
+            R skusHasStock = wareFeignService.getSkusHasStock(skuIdList);
+
+            TypeReference<List<SkuHasStockVo>> typeReference = new TypeReference<>() {};
+
+            stockMap = skusHasStock.getData(typeReference).stream().collect(
+                    Collectors.toMap(SkuHasStockVo::getSkuId, item -> item.getHasStock()));
+        } catch (Exception e) {
+            log.error("库存服务查询异常：原因{}", e);
+        }
+
+        /**
+         * 4 封装每个sku信息
+         */
+        Map<Long, Boolean> finalStockMap = stockMap;
+        List<SkuEsModel> upProducts = skus.stream().map((sku) -> {
+            // 组装需要的数据
+            SkuEsModel esModel = new SkuEsModel();
+
+            // 1、拷贝信息，同时将名称不同，但是含义相同的一起设置拷贝出来
+            BeanUtils.copyProperties(sku, esModel);
+            esModel.setSkuPrice(sku.getPrice());
+            esModel.setSkuImg(sku.getSkuDefaultImg());
+
+            // 2、设置库存信息
+            esModel.setHasStock(finalStockMap.getOrDefault(sku.getSkuId(), true));
+
+            // 3、热度评分。默认为0
+            esModel.setHotScore(0L);
+
+            // 4、查询品牌的名字信息
+            BrandEntity brand = brandService.getById(esModel.getBrandId());
+            esModel.setBrandName(brand.getName());
+            esModel.setBrandImg(brand.getLogo());
+
+            // 5、查询分类的名字信息
+            CategoryEntity category = categoryService.getById(esModel.getCatalogId());
+            esModel.setCatalogName(category.getName());
+
+            // 6、设置检索属性
+            esModel.setAttrs(attrsList);
+
+            return esModel;
+        }).collect(Collectors.toList());
+
+        /**
+         * 5 将数据发送给es进行存储
+         */
+        R r = searchFeignService.productStatusUp(upProducts);
+        if(r.getCode() == 0) {
+            // 远程调用成功
+            /**
+             * 6 修改当前spu状态【变为已上架】
+             */
+            baseMapper.updateSpuStatus(spuId, ProductConstant.StatusEnum.SPU_UP.getCode());
+        }
+        else {
+            // 远程调用失败
+            /**
+             * TODO 7 重复调用问题，接口幂等性，重试机制
+             */
+            /**
+             * Feign调用流程
+             *      1 构造请求数据，将对象转为json
+             *          RequestTemplate template = buildTemplateFromArgs.create(argv);
+             *      2 发送请求进行执行（执行成功会解码响应数据）
+             *          executeAndDecode(template);
+             *      3 执行请求会有重试机制
+             *          while(true) {
+             *              try {
+             *                  executeAndDecode(template);
+             *              } catch () {
+             *                  try {
+             *                      retryer.continueOrPropagate(e);
+             *                  } catch () {
+             *                      throw ex;
+             *                  }
+             *                  continue;
+             *              }
+             *          }
+             */
+        }
     }
 
 }

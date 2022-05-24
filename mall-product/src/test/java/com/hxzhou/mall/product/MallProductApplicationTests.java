@@ -3,13 +3,19 @@ package com.hxzhou.mall.product;
 import com.aliyun.oss.*;
 import com.aliyun.oss.model.PutObjectRequest;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.hxzhou.mall.product.dao.AttrGroupDao;
+import com.hxzhou.mall.product.dao.SkuSaleAttrValueDao;
 import com.hxzhou.mall.product.entity.BrandEntity;
 import com.hxzhou.mall.product.service.BrandService;
 import com.hxzhou.mall.product.service.CategoryService;
+import com.hxzhou.mall.product.vo.SkuItemVo;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
+import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.data.redis.core.ValueOperations;
 
 import java.io.File;
 import java.util.*;
@@ -148,5 +154,46 @@ class MallProductApplicationTests {
         Long[] catelogPath = categoryService.findCatelogPath(225L);
         log.info("完整路径：{}", Arrays.asList(catelogPath));
 
+    }
+
+    @Autowired
+    StringRedisTemplate stringRedisTemplate;
+
+    @Test
+    public void testStringRedisTemplate() {
+        ValueOperations<String, String> ops = stringRedisTemplate.opsForValue();
+
+        // 保存
+        ops.set("hello", "world_" + UUID.randomUUID().toString());
+
+        // 查询
+        String hello = ops.get("hello");
+        System.out.println("之前保存的数据是：" + hello);
+    }
+
+    @Autowired
+    RedissonClient redissonClient;
+
+    @Test
+    public void redisson() {
+        System.out.println(redissonClient);
+    }
+
+    @Autowired
+    AttrGroupDao attrGroupDao;
+
+    @Test
+    public void testGetAttrGroupWithAttrsBySpuId() {
+        List<SkuItemVo.SpuItemAttrGroupVo> attrGroupWithAttrsBySpuId = attrGroupDao.getAttrGroupWithAttrsBySpuId(16L, 225L);
+        System.out.println(attrGroupWithAttrsBySpuId);
+    }
+
+    @Autowired
+    SkuSaleAttrValueDao skuSaleAttrValueDao;
+
+    @Test
+    public void testGetSaleAttrsBySpuId() {
+        List<SkuItemVo.SkuItemSaleAttrVo> saleAttrsBySpuId = skuSaleAttrValueDao.getSaleAttrsBySpuId(16L);
+        System.out.println(saleAttrsBySpuId);
     }
 }
