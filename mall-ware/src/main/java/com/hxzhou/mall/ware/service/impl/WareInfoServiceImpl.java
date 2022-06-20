@@ -1,6 +1,14 @@
 package com.hxzhou.mall.ware.service.impl;
 
+import com.alibaba.fastjson.TypeReference;
+import com.hxzhou.common.utils.R;
+import com.hxzhou.mall.ware.feign.MemberFeignService;
+import com.hxzhou.mall.ware.vo.FareVo;
+import com.hxzhou.mall.ware.vo.MemberAddressVo;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.math.BigDecimal;
 import java.util.Map;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -16,6 +24,9 @@ import org.springframework.util.StringUtils;
 
 @Service("wareInfoService")
 public class WareInfoServiceImpl extends ServiceImpl<WareInfoDao, WareInfoEntity> implements WareInfoService {
+
+    @Autowired
+    MemberFeignService memberFeignService;
 
     @Override
     public PageUtils queryPage(Map<String, Object> params) {
@@ -37,4 +48,25 @@ public class WareInfoServiceImpl extends ServiceImpl<WareInfoDao, WareInfoEntity
         return new PageUtils(page);
     }
 
+    /**
+     * 根据收货地址id查询运费信息
+     * @param addrId
+     * @return
+     */
+    @Override
+    public FareVo getFare(Long addrId) {
+        FareVo fareVo = new FareVo();
+
+        R r = memberFeignService.addrInfo(addrId);
+        MemberAddressVo data = r.getData("memberReceiveAddress", new TypeReference<MemberAddressVo>(){});
+        fareVo.setAddress(data);
+
+        if(data != null) {
+            String phone = data.getPhone();
+            String substring = phone.substring(phone.length() - 1, phone.length());
+            fareVo.setFare(new BigDecimal(substring));
+        }
+
+        return fareVo;
+    }
 }

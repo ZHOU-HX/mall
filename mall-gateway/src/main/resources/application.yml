@@ -35,6 +35,14 @@ spring:
           filters:
             - RewritePath=/api/(?<segment>.*),/$\{segment}
 
+        # 优惠券服务的路由规则
+        - id: coupon_route
+          uri: lb://mall-coupon
+          predicates:
+            - Path=/api/coupon/**
+          filters:
+            - RewritePath=/api/(?<segment>.*),/$\{segment}
+
         # 文件上传阿里云的路由规则
         - id: third_party_route
           uri: lb://mall-third-party
@@ -56,6 +64,36 @@ spring:
           uri: lb://mall-product
           predicates:
             - Host=mall.com,item.mall.com
+
+        # 负载均衡的规则：希望登录和注册界面请求发送到auth服务中
+        - id: mall_auth_route
+          uri: lb://mall-auth-server
+          predicates:
+            - Host=auth.mall.com
+
+        # 负载均衡的规则：希望购物车界面请求发送到cart服务中
+        - id: mall_cart_route
+          uri: lb://mall-cart
+          predicates:
+            - Host=cart.mall.com
+
+        # 负载均衡的规则：希望订单以及结算界面请求发送到order服务中
+        - id: mall_order_route
+          uri: lb://mall-order
+          predicates:
+            - Host=order.mall.com
+
+        # 负载均衡的规则：希望查看订单界面请求发送到member服务中
+        - id: mall_member_route
+          uri: lb://mall-member
+          predicates:
+            - Host=member.mall.com
+
+        # 负载均衡的规则：希望查看秒杀界面请求发送到seckill服务中
+        - id: mall_seckill_route
+          uri: lb://mall-seckill
+          predicates:
+            - Host=seckill.mall.com
 
         # 负载均衡的规则：希望所有的查询请求发送到search服务中
         - id: mall_search_route

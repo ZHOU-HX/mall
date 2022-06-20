@@ -49,5 +49,10 @@
         <result property="modifyTime" column="modify_time"/>
     </resultMap>
 
+    <!-- 根据订单号更改为指定的状态 -->
+    <update id="updateOrderStatus">
+        UPDATE oms_order SET status = #{code} WHERE order_sn = #{outTradeNo}
+    </update>
+
 
 </mapper>

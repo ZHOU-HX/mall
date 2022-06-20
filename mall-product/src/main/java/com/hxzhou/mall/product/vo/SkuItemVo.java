@@ -23,6 +23,8 @@ public class SkuItemVo {
 
     private boolean hasStock = true;                // 是否有货
 
+    private SeckillInfoVo seckillInfoVo;              // 当前商品的秒杀优惠信息
+
     // =====================================================================================
 
     @ToString

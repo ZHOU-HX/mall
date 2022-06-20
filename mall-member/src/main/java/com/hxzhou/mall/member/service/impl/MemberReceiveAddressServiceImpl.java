@@ -1,6 +1,8 @@
 package com.hxzhou.mall.member.service.impl;
 
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 import java.util.Map;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -24,6 +26,16 @@ public class MemberReceiveAddressServiceImpl extends ServiceImpl<MemberReceiveAd
         );
 
         return new PageUtils(page);
+    }
+
+    /**
+     * 根据id获取收获地址列表信息
+     * @param memberId
+     * @return
+     */
+    @Override
+    public List<MemberReceiveAddressEntity> getAddress(Long memberId) {
+        return this.list(new QueryWrapper<MemberReceiveAddressEntity>().eq("member_id", memberId));
     }
 
 }

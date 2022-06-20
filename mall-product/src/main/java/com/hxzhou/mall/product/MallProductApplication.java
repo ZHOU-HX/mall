@@ -6,6 +6,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 import org.springframework.cloud.openfeign.EnableFeignClients;
+import org.springframework.session.data.redis.config.annotation.web.http.EnableRedisHttpSession;
 
 /**
  * 一、整合mybatis-plus
@@ -83,6 +84,7 @@ import org.springframework.cloud.openfeign.EnableFeignClients;
  *          -> 就会应用到当前RedisCacheManager管理的所有缓存分区中
  *
  */
+@EnableRedisHttpSession     // 整合redis作为session存储
 @EnableFeignClients(basePackages = "com.hxzhou.mall.product.feign")        // 开启远程调用功能
 @EnableDiscoveryClient
 @MapperScan("com.hxzhou.mall.product.dao")

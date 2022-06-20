@@ -9,6 +9,10 @@ spring:
       oss:
         endpoint: oss-cn-hangzhou.aliyuncs.com
         bucket: mall-hxzhou
+      sms:
+        host: https://dfsns.market.alicloudapi.com
+        path: /data/send_sms
+        appcode: d4e989fb29304aba897a01c908df0bec
 
   application:
     name: mall-third-party

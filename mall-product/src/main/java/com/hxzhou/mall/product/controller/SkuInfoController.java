@@ -1,20 +1,18 @@
 package com.hxzhou.mall.product.controller;
 
+import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.hxzhou.mall.product.entity.SkuInfoEntity;
 import com.hxzhou.mall.product.service.SkuInfoService;
 import com.hxzhou.common.utils.PageUtils;
 import com.hxzhou.common.utils.R;
 
+import javax.ws.rs.GET;
 
 
 /**
@@ -29,6 +27,15 @@ import com.hxzhou.common.utils.R;
 public class SkuInfoController {
     @Autowired
     private SkuInfoService skuInfoService;
+
+    /**
+     * 获取商品的价格信息
+     */
+    @GetMapping("/{skuId}/price")
+    public R getPrice(@PathVariable("skuId") Long skuId) {
+        SkuInfoEntity byId = skuInfoService.getById(skuId);
+        return R.ok().setData(byId.getPrice().toString());
+    }
 
     /**
      * 列表

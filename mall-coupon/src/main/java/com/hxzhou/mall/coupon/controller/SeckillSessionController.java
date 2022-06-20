@@ -1,14 +1,11 @@
 package com.hxzhou.mall.coupon.controller;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.hxzhou.mall.coupon.entity.SeckillSessionEntity;
 import com.hxzhou.mall.coupon.service.SeckillSessionService;
@@ -29,6 +26,17 @@ import com.hxzhou.common.utils.R;
 public class SeckillSessionController {
     @Autowired
     private SeckillSessionService seckillSessionService;
+
+    /**
+     * 获取最近三天秒杀的商品
+     * @return
+     */
+    @GetMapping("/latest3DaySession")
+    public R getLatest3DaySession() {
+        List<SeckillSessionEntity> sessionEntities = seckillSessionService.getLatest3DaySession();
+
+        return R.ok().setData(sessionEntities);
+    }
 
     /**
      * 列表

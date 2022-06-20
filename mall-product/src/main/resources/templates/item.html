@@ -57,8 +57,13 @@
 							</li>
 						</ul>
 						<ul class="header_ul_right">
-							<li style="border: 0;"><a href="/static/item/../登录页面\index.html" class="aa">你好，请登录</a></li>
-							<li><a href="/static/item/../注册页面\index.html" style="color: red;">免费注册</a> |</li>
+							<li style="border: 0;">
+								<a th:if="${session.loginUser == null}" href="http://auth.mall.com/login.html" class="aa">你好，请登录</a>
+								<a th:if="${session.loginUser != null}" class="aa">欢迎，[[${session.loginUser == null ? '' : session.loginUser.nickname}]]</a>
+							</li>
+							<li>
+								<a th:if="${session.loginUser == null}" href="http://auth.mall.com/reg.html" style="color: red;">免费注册</a> |
+							</li>
 							<li><a href="/static/item/javascript:;" class="aa">我的订单</a> |</li>
 							<li class="jingdong"><a href="/static/item/javascript:;">我的京东</a><span class="glyphicon glyphicon-menu-down">|</span>
 								<ol class="jingdong_ol">
@@ -251,7 +256,7 @@
 				<nav>
 				<div class="nav_min">
 					<div class="nav_top">
-						<div class="nav_top_one"><a href="/static/item/#"><img src="/static/item/img/111.png"/></a></div>
+						<div class="nav_top_one"><a href="http://mall.com"><img src="/static/item/img/111.png"/></a></div>
 						<div class="nav_top_two"><input type="text"/><button>搜索</button></div>
 						<div class="nav_top_three"><a href="/static/item/../JD_Shop/One_JDshop.html">我的购物车</a><span class="glyphicon glyphicon-shopping-cart"></span>
 							<div class="nav_top_three_1">
@@ -505,8 +510,16 @@
 									<span>￥</span>
 									<span th:text="${#numbers.formatDecimal(item.info.price, 3, 2)}">4499.00</span>
 								</li>
-								<li>
-									预约享资格
+								<li style="color: red" th:if="${item.seckillInfoVo != null}">
+									<span th:if="${#dates.createNow().getTime() < item.seckillInfoVo.startTime}">
+										商品将会在
+										[[${#dates.format(new java.util.Date(item.seckillInfoVo.startTime), "yyyy-MM-dd HH:mm:ss")}]]
+										进行秒杀
+									</span>
+									<span th:if="${#dates.createNow().getTime() >= item.seckillInfoVo.startTime
+													&& #dates.createNow().getTime() <= item.seckillInfoVo.endTime}">
+										秒杀价：[[${#numbers.formatDecimal(item.seckillInfoVo.seckillPrice, 1, 2)}]]
+									</span>
 								</li>
 								<li>
 									<a href="/static/item/">
@@ -612,7 +625,7 @@
 
 						<div class="box-btns clear">
 							<div class="box-btns-one">
-								<input type="text" name="" id="" value="1" />
+								<input type="text" name="" id="numInput" value="1" />
 								<div class="box-btns-one1">
 
 									<div>
@@ -628,9 +641,19 @@
 
 								</div>
 							</div>
-							<div class="box-btns-two">
-								<a href="/static/item/../商品分类\index.html">
-									立即预约
+							<div class="box-btns-two" th:if="${item.seckillInfoVo == null || (#dates.createNow().getTime() < item.seckillInfoVo.startTime
+													|| #dates.createNow().getTime() > item.seckillInfoVo.endTime)}">
+								<a href="#" id="addToCartA" th:attr="skuId=${item.info.skuId}">
+									加入购物车
+								</a>
+							</div>
+							<div class="box-btns-two" th:if="${item.seckillInfoVo != null && (#dates.createNow().getTime() >= item.seckillInfoVo.startTime
+													&& #dates.createNow().getTime() <= item.seckillInfoVo.endTime)}">
+								<a href="#" id="secKillA"
+								   th:attr="skuId=${item.info.skuId},
+								   			sessionId=${item.seckillInfoVo.promotionSessionId},
+								   			code=${item.seckillInfoVo.randomCode}">
+									立即抢购
 								</a>
 							</div>
 							<div class="box-btns-three">
@@ -1304,6 +1327,33 @@
 			$(".sku_attr_value").parent().css({"border" : "solid 1px #CCC"});
 			$("a[class='sku_attr_value checked']").parent().css({"border" : "solid 1px red"});
 
+		});
+
+		$("#addToCartA").click(function () {
+			var num = $("#numInput").val();
+			var skuId = $(this).attr("skuId");
+
+			location.href = "http://cart.mall.com/addToCart?skuId=" + skuId + "&num=" + num;
+
+			return false;
+		});
+
+		$("#secKillA").click(function () {
+			var isLogin = [[${session.loginUser != null}]];
+
+			// 登录了才可以去秒杀
+			if(isLogin) {
+				var killId = $(this).attr("sessionid") + "_" + $(this).attr("skuid");
+				var key = $(this).attr("code");
+				var num = $("#numInput").val();
+
+				location.href = "http://seckill.mall.com/kill?killId=" + killId + "&key=" + key + "&num=" + num;
+			}
+			else {
+				alert("请先登录再秒杀！");
+			}
+
+			return false;
 		});
 	</script>
 
